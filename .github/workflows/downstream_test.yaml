@@ -1,0 +1,17 @@
+name: downstream_test
+
+on: [push]
+
+jobs:
+  dispatch:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/github-script@v6
+      with:
+        script: |
+          await github.rest.actions.createWorkflowDispatch({
+            owner: 'maximlt',
+            repo: 'test_a',
+            workflow_id: 'test.yaml',
+            ref: 'main'
+          })
