@@ -10,10 +10,11 @@ jobs:
       with:
         github-token: ${{ secrets.MY_PAT }}
         script: |
-          await github.rest.actions.createWorkflowDispatch({
+          const dummy = await github.rest.actions.createWorkflowDispatch({
             owner: 'maximlt',
             repo: 'test_a',
             workflow_id: 'test.yaml',
             ref: 'main',
             inputs: {"mode": "from another workflow"}
           })
+          console.log(dummy)
