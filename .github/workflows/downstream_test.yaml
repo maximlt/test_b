@@ -25,6 +25,6 @@ jobs:
         ref: main
         wait_interval: 10
         inputs: '{"caller": "from upstream"}'
-        propagate_failure: false
+        propagate_failure: true
         trigger_workflow: true
         wait_workflow: true
