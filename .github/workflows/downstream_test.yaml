@@ -3,28 +3,17 @@ name: testing_downstream
 on: [push]
 
 jobs:
-  downstream_1_test:
+  testing_downstream:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        repo: ['downstream_1', 'downstream_2']
+      fail-fast: false
     steps:
     - uses: convictional/trigger-workflow-and-wait@v1.3.0
       with:
         owner: maximlt
-        repo: downstream_1
-        github_token: ${{ secrets.MY_PAT }}
-        workflow_file_name: test.yaml
-        ref: main
-        wait_interval: 10
-        inputs: '{"mode": "from upstream"}'
-        propagate_failure: false
-        trigger_workflow: true
-        wait_workflow: true
-  downstream_2_test:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: convictional/trigger-workflow-and-wait@v1.3.0
-      with:
-        owner: maximlt
-        repo: downstream_2
+        repo: ${{ matrix.repo }}
         github_token: ${{ secrets.MY_PAT }}
         workflow_file_name: test.yaml
         ref: main
