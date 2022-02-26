@@ -1,20 +1,35 @@
-name: downstream_test
+name: testing_downstream
 
 on: [push]
 
 jobs:
-  dispatch:
+  downstream_a_test:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/github-script@v6
+    - uses: convictional/trigger-workflow-and-wait@v1.3.0
       with:
-        github-token: ${{ secrets.MY_PAT }}
-        script: |
-          const dummy = await github.rest.actions.createWorkflowDispatch({
-            owner: 'maximlt',
-            repo: 'test_a',
-            workflow_id: 'test.yaml',
-            ref: 'main',
-            inputs: {"mode": "from another workflow"}
-          })
-          console.log(dummy)
+        owner: maximlt
+        repo: downstream_a
+        github_token: ${{ secrets.MY_PAT }}
+        workflow_file_name: test.yaml
+        ref: main
+        wait_interval: 10
+        inputs: '{"mode": "from upstream"}'
+        propagate_failure: false
+        trigger_workflow: true
+        wait_workflow: true
+  downstream_b_test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: convictional/trigger-workflow-and-wait@v1.3.0
+      with:
+        owner: maximlt
+        repo: downstream_b
+        github_token: ${{ secrets.MY_PAT }}
+        workflow_file_name: test.yaml
+        ref: main
+        wait_interval: 10
+        inputs: '{"mode": "from upstream"}'
+        propagate_failure: false
+        trigger_workflow: true
+        wait_workflow: true
