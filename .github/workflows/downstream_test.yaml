@@ -3,13 +3,13 @@ name: testing_downstream
 on: [push]
 
 jobs:
-  downstream_a_test:
+  downstream_1_test:
     runs-on: ubuntu-latest
     steps:
     - uses: convictional/trigger-workflow-and-wait@v1.3.0
       with:
         owner: maximlt
-        repo: downstream_a
+        repo: downstream_1
         github_token: ${{ secrets.MY_PAT }}
         workflow_file_name: test.yaml
         ref: main
@@ -18,13 +18,13 @@ jobs:
         propagate_failure: false
         trigger_workflow: true
         wait_workflow: true
-  downstream_b_test:
+  downstream_2_test:
     runs-on: ubuntu-latest
     steps:
     - uses: convictional/trigger-workflow-and-wait@v1.3.0
       with:
         owner: maximlt
-        repo: downstream_b
+        repo: downstream_2
         github_token: ${{ secrets.MY_PAT }}
         workflow_file_name: test.yaml
         ref: main
