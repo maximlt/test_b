@@ -16,6 +16,10 @@ jobs:
         repo: ['downstream_1', 'downstream_2']
       fail-fast: false
     steps:
+    - name: Print event data
+      env:
+        EVENT: ${{ toJSON( github.event ) }}
+      run: echo "$EVENT"
     - name: Install jq
       run: sudo apt install -y jq
     - uses: actions/checkout@v2
@@ -27,23 +31,23 @@ jobs:
     - name: Get version from git tag
       id: from_git
       run: |
-        echo ::set-output name=version::$(git tag -l --sort=-creatordate | head -n 1)
+        echo ::set-output name=version::$(git tag -l --sort=-creatordate | head -n 1 | cut -c 2-)
     - uses: conda-incubator/setup-miniconda@v2
       name: Install conda with miniconda
       with:
         miniconda-version: "latest"
         auto-activate-base: true
         activate-environment: ""
-    - name: Get latest version available on conda
+    - name: Conda search this version
       id: from_conda
       shell: bash -l {0}
       run: |
-        echo ::set-output name=version::$(conda search -c pyviz/label/dev 'param=foo' --json | jq ".param[0].version")
+        echo ::set-output name=version::$(conda search -c pyviz/label/dev "param=${{ steps.from_git.outputs.version }}" --json | jq ".param[0].version")
     - name: Print tag and conda version found
       run: |
         echo "git tag: ${{ steps.from_git.outputs.version }}"
         echo "conda version: ${{ steps.from_conda.outputs.version }}"
-    - name: Stop if versions are different
+    - name: Stop if git tag and conda version are different
       if: steps.from_git.outputs.version != steps.from_conda.outputs.version
       run: exit 1
     - uses: convictional/trigger-workflow-and-wait@v1.5.0
