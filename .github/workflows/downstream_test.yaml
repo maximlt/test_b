@@ -19,6 +19,7 @@ jobs:
       matrix:
         repo: ['downstream_1', 'downstream_2']
       fail-fast: false
+    timeout-minutes: 120
     steps:
     - name: Print event data
       env:
@@ -53,7 +54,7 @@ jobs:
         echo "git tag: ${{ steps.from_git.outputs.version }}"
         echo "conda version: ${{ steps.from_conda.outputs.version }}"
     - name: Stop if git tag and conda version are different
-      if: ${{ steps.from_git.outputs.version }} != ${{ steps.from_conda.outputs.version }}
+      if: ${{ steps.from_git.outputs.version != steps.from_conda.outputs.version }}
       run: exit 1
     - uses: convictional/trigger-workflow-and-wait@v1.5.0
       name: Trigger downstream test workflow and wait
