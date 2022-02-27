@@ -16,6 +16,8 @@ jobs:
         repo: ['downstream_1', 'downstream_2']
       fail-fast: false
     steps:
+    - name: Install jq
+      run: sudo apt insall -y jq
     - uses: actions/checkout@v2
       with:
         fetch-depth: "1"
