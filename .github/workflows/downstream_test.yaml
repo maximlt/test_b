@@ -47,7 +47,13 @@ jobs:
       id: from_conda
       shell: bash -l {0}
       run: |
-        echo ::set-output name=version::$(conda search --override-channels -c pyviz/label/dev "${{ env.REPO }}=1.12.0a5" --json | jq ".${{ env.REPO }}[0].version")
+        # Use conda search to get metadata as json for a specific version.
+        # If it's not available then version will be set to null, otherwise
+        # it'll be set to the version found in the metadata, .e. 1.12.1a1 (jq -r removes
+        # the surrounding quotes).
+        # Using only pyviz/label/dev for the search, since dev releases and releases can
+        # both be found in this channel. 
+        echo ::set-output name=version::$(conda search --override-channels -c pyviz/label/dev "${{ env.REPO }}==1.12.0a6" --json | jq -r ".${{ env.REPO }}[0].version")
         # echo ::set-output name=version::$(conda search -c pyviz/label/dev "${{ env.REPO }}=${{ steps.from_git.outputs.version }}" --json | jq ".${{ env.REPO }}[0].version")
     - name: Print tag and conda version found
       run: |
