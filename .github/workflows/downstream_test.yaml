@@ -19,6 +19,7 @@ jobs:
     - name: Install jq
       run: sudo apt install -y jq
     - uses: actions/checkout@v2
+      name: Checkout repo
       with:
         fetch-depth: "1"
     - name: Fetch tags
@@ -26,8 +27,7 @@ jobs:
     - name: Get version from git tag
       id: from_git
       run: |
-        echo ::set-output name=version::${GITHUB_REF#refs/*/}
-        echo "Got version ${GITHUB_REF#refs/*/} from git tag"
+        echo ::set-output name=version::$(git tag -l --sort=-creatordate | head -n 1)
     - uses: conda-incubator/setup-miniconda@v2
       name: Install conda with miniconda
       with:
@@ -39,10 +39,10 @@ jobs:
       shell: bash -l {0}
       run: |
         echo ::set-output name=version::$(conda search -c pyviz/label/dev 'param=foo' --json | jq ".param[0].version")
-    - name: debug
+    - name: Print tag and conda version found
       run: |
-        echo "${{ steps.from_git.outputs.version }}"
-        echo "${{ steps.from_conda.outputs.version }}"
+        echo "git tag: ${{ steps.from_git.outputs.version }}"
+        echo "conda version: ${{ steps.from_conda.outputs.version }}"
     - name: Stop if versions are different
       if: steps.from_git.outputs.version != steps.from_conda.outputs.version
       run: exit 1
