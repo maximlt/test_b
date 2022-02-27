@@ -16,7 +16,39 @@ jobs:
         repo: ['downstream_1', 'downstream_2']
       fail-fast: false
     steps:
+    - uses: Fetch tags
+      run: git fetch --tags
+    - name: Get version from git tag
+      id: from_git
+      run: |
+        echo ::set-output name=version::${GITHUB_REF#refs/*/}
+        echo "Got version ${GITHUB_REF#refs/*/} from git tag"
+    - uses: conda-incubator/setup-miniconda@v2
+      name: Install conda with miniconda
+      with:
+        miniconda-version: "latest"
+        auto-activate-base: true
+        activate-environment: ""
+    - name: Get latest version available on conda
+      id: from_conda
+      shell: bash -l {0}
+      run: |
+        cversion=conda search -c pyviz/label/dev 'param=ooo' --json | jq ".param[0].version"
+        if [[ version != "null" ]]
+        then
+          echo ::set-output name=version::cversion
+        else
+          echo "Version ${{ steps.from_git.outputs.version }} not found"
+          exit 1
+        fi
+    - name: Compare git and conda version
+      run: |
+        if [[ ${{ steps.from_git.outputs.version }} != ${{ steps.from_conda.outputs.version }} ]]
+        then
+          echo "Git tag and latest conda version available are different"
+          exit 1
     - uses: convictional/trigger-workflow-and-wait@v1.5.0
+      name: Trigger downstream test workflow and wait
       with:
         owner: maximlt
         repo: ${{ matrix.repo }}
@@ -28,3 +60,5 @@ jobs:
         propagate_failure: true
         trigger_workflow: true
         wait_workflow: true
+
+
