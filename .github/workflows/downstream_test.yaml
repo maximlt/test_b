@@ -47,7 +47,7 @@ jobs:
       id: from_conda
       shell: bash -l {0}
       run: |
-        echo ::set-output name=version::$(conda search --override-channels -c pyviz/label/dev "${{ env.REPO }}=1.12.0a4" --json | jq ".${{ env.REPO }}[0].version")
+        echo ::set-output name=version::$(conda search --override-channels -c pyviz/label/dev "${{ env.REPO }}=1.12.0a5" --json | jq ".${{ env.REPO }}[0].version")
         # echo ::set-output name=version::$(conda search -c pyviz/label/dev "${{ env.REPO }}=${{ steps.from_git.outputs.version }}" --json | jq ".${{ env.REPO }}[0].version")
     - name: Print tag and conda version found
       run: |
