@@ -33,23 +33,16 @@ jobs:
         auto-activate-base: true
         activate-environment: ""
     - name: Get latest version available on conda
-      id: from_conda
       shell: bash -l {0}
       run: |
-        cversion=conda search -c pyviz/label/dev 'param=ooo' --json | jq ".param[0].version"
-        if [[ version != "null" ]]
+        version=$(conda search -c pyviz/label/dev 'param=foo' --json | jq ".param[0].version")
+        if [[ "$version" != "null" ]]
         then
-          echo ::set-output name=version::cversion
+          echo "Version ${{ steps.from_git.outputs.version }} found with conda search -c pyviz/dev/label"
         else
-          echo "Version ${{ steps.from_git.outputs.version }} not found"
+          echo "Version ${{ steps.from_git.outputs.version }} not found with conda search -c pyviz/dev/label"
           exit 1
         fi
-    - name: Compare git and conda version
-      run: |
-        if [[ ${{ steps.from_git.outputs.version }} != ${{ steps.from_conda.outputs.version }} ]]
-        then
-          echo "Git tag and latest conda version available are different"
-          exit 1
     - uses: convictional/trigger-workflow-and-wait@v1.5.0
       name: Trigger downstream test workflow and wait
       with:
