@@ -6,6 +6,9 @@ on:
     workflows: [build]
     types: [completed]
 
+env:
+  REPO: ${{ github.event.repository.name }}
+
 jobs:
   testing_downstream:
     runs-on: ubuntu-latest
@@ -42,7 +45,7 @@ jobs:
       id: from_conda
       shell: bash -l {0}
       run: |
-        echo ::set-output name=version::$(conda search -c pyviz/label/dev "param=${{ steps.from_git.outputs.version }}" --json | jq ".param[0].version")
+        echo ::set-output name=version::$(conda search -c pyviz/label/dev "${{ env.REPO }}=${{ steps.from_git.outputs.version }}" --json | jq ".${{ env.REPO }}[0].version")
     - name: Print tag and conda version found
       run: |
         echo "git tag: ${{ steps.from_git.outputs.version }}"
