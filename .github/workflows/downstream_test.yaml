@@ -35,7 +35,7 @@ jobs:
         auto-activate-base: true
         activate-environment: ""
     - name: Get latest version available on conda
-      if: from_conda
+      id: from_conda
       shell: bash -l {0}
       run: |
         echo ::set-output name=version::$(conda search -c pyviz/label/dev 'param=foo' --json | jq ".param[0].version")
