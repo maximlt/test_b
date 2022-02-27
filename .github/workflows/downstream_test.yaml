@@ -16,6 +16,9 @@ jobs:
         repo: ['downstream_1', 'downstream_2']
       fail-fast: false
     steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: "1"
     - name: Fetch tags
       run: git fetch --tags
     - name: Get version from git tag
