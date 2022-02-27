@@ -42,7 +42,7 @@ jobs:
     - name: debug
       run: |
         echo "${{ steps.from_git.outputs.version }}"
-        echo "${{ steps.from_conda.outputs.version }}""
+        echo "${{ steps.from_conda.outputs.version }}"
     - name: Stop if versions are different
       if: steps.from_git.outputs.version != steps.from_conda.outputs.version
       run: exit 1
