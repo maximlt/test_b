@@ -16,7 +16,7 @@ jobs:
         repo: ['downstream_1', 'downstream_2']
       fail-fast: false
     steps:
-    - uses: Fetch tags
+    - name: Fetch tags
       run: git fetch --tags
     - name: Get version from git tag
       id: from_git
