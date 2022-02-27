@@ -38,7 +38,7 @@ jobs:
       shell: bash -l {0}
       run: |
         version=$(conda search -c pyviz/label/dev 'param=foo' --json | jq ".param[0].version")
-        if [[ "$version" != "null" ]]
+        if [[ "$version" == "${{ steps.from_git.outputs.version }}" ]]
         then
           echo "Version ${{ steps.from_git.outputs.version }} found with conda search -c pyviz/dev/label"
         else
