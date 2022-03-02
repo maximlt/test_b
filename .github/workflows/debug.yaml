@@ -1,4 +1,4 @@
-name: docs
+name: debug
 on:
   push:
     tags:
@@ -18,7 +18,7 @@ on:
         default: dev
 
 jobs:
-  build_docs:
+  debug_wf:
     name: Documentation
     runs-on: 'ubuntu-latest'
     timeout-minutes: 120
