@@ -36,7 +36,9 @@ jobs:
           fetch-depth: "100"
       - name: Set output
         id: vars
-        run: echo ::set-output name=tag::${GITHUB_REF#refs/*/}
+        run: |
+          echo "Deploying site from ${GITHUB_REF#refs/*/}" 
+          echo ::set-output name=tag::${GITHUB_REF#refs/*/}
       - name: debug
         run: |
           echo "target: ${{ github.event.inputs.target }}"
