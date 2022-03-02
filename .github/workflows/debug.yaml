@@ -1,0 +1,59 @@
+name: docs
+on:
+  push:
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+'
+      - 'v[0-9]+.[0-9]+.[0-9]+a[0-9]+'
+      - 'v[0-9]+.[0-9]+.[0-9]+b[0-9]+'
+      - 'v[0-9]+.[0-9]+.[0-9]+rc[0-9]+'
+  workflow_dispatch:
+    inputs:
+      target:
+        description: 'Site to build and deploy'   
+        type: choice
+        options:
+        - dev
+        - main  
+        required: true
+        default: dev
+
+jobs:
+  build_docs:
+    name: Documentation
+    runs-on: 'ubuntu-latest'
+    timeout-minutes: 120
+    defaults:
+      run:
+        shell: bash -l {0}
+    env:
+      DESC: "Documentation build"
+      MPLBACKEND: "Agg"
+      MOZ_HEADLESS: 1
+      DISPLAY: ":99.0"
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: "100"
+      - name: Set output
+        id: vars
+        run: echo ::set-output name=tag::${GITHUB_REF#refs/*/}
+      - name: debug
+        run: |
+          echo "target: ${{ github.event.inputs.target }}"
+          echo "tag: ${{ steps.vars.outputs.tag }}"
+          echo "event name is:" ${{ github.event_name }}
+          echo "event type is:" ${{ github.event.action }}
+          echo "${{ toJSON( github.event ) }}"
+          echo ${{ (github.event_name == 'workflow_dispatch' && github.event.inputs.target == 'dev') }}
+          echo ${{ !(contains(steps.vars.outputs.tag, 'a') || contains(steps.vars.outputs.tag, 'b') || contains(steps.vars.outputs.tag, 'rc')) }}
+      - name: debug dev
+        if: |
+          (github.event_name == 'workflow_dispatch' && github.event.inputs.target == 'dev') ||
+          (github.event_name == 'push' && (contains(steps.vars.outputs.tag, 'a') || contains(steps.vars.outputs.tag, 'b') || contains(steps.vars.outputs.tag, 'rc')))
+        run: echo "dev"
+      - name: debug main
+        if: |
+          (github.event_name == 'workflow_dispatch' && github.event.inputs.target == 'main') ||
+          (github.event_name == 'push' && !(contains(steps.vars.outputs.tag, 'a') || contains(steps.vars.outputs.tag, 'b') || contains(steps.vars.outputs.tag, 'rc')))
+        run: echo "dev"
+    
