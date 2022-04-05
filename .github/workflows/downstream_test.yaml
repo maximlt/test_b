@@ -6,6 +6,12 @@ on:
     workflows: [build]
     types: [completed]
   workflow_dispatch:
+    inputs:
+      manual:
+        description: don't change me!
+        type: boolean
+        required: true
+        default: true
 
 jobs:
   downstream_tests:
