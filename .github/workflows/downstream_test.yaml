@@ -6,77 +6,10 @@ on:
     workflows: [build]
     types: [completed]
 
-env:
-  REPO: 'param'
-  # REPO: ${{ github.event.repository.name }}
-
 jobs:
-  check_if_run:
-    runs-on: ubuntu-latest
-    # Run only if the build workflow has completed with success.
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
-    timeout-minutes: 10
-    steps:
-    - name: Print event data
-      env:
-        EVENT: ${{ toJSON( github.event ) }}
-      run: echo "$EVENT"
-    - name: Install jq
-      run: sudo apt install -y jq
-    - uses: actions/checkout@v2
-      name: Checkout repo
-      with:
-        fetch-depth: "1"
-    - name: Fetch tags
-      run: git fetch --tags
-    - name: Get version from git tag
-      id: from_git
-      run: |
-        echo ::set-output name=version::$(git tag -l --sort=-creatordate | head -n 1 | cut -c 2-)
-    - uses: conda-incubator/setup-miniconda@v2
-      name: Install conda with miniconda
-      with:
-        miniconda-version: "latest"
-        auto-activate-base: true
-        activate-environment: ""
-    - name: Conda search this version
-      id: from_conda
-      shell: bash -l {0}
-      run: |
-        # Use conda search to get metadata as json for a specific version.
-        # If it's not available then version will be set to null, otherwise
-        # it'll be set to the version found in the metadata, .e. 1.12.1a1 (jq -r removes
-        # the surrounding quotes).
-        # Using only pyviz/label/dev for the search, since dev releases and releases can
-        # both be found in this channel. 
-        echo ::set-output name=version::$(conda search --override-channels -c pyviz/label/dev "${{ env.REPO }}==1.12.0a6" --json | jq -r ".${{ env.REPO }}[0].version")
-        # echo ::set-output name=version::$(conda search -c pyviz/label/dev "${{ env.REPO }}=${{ steps.from_git.outputs.version }}" --json | jq ".${{ env.REPO }}[0].version")
-    - name: Print tag and conda version found
-      run: |
-        echo "git tag: ${{ steps.from_git.outputs.version }}"
-        echo "conda version: ${{ steps.from_conda.outputs.version }}"
-    - name: Stop if git tag and conda version are different
-      if: ${{ steps.from_git.outputs.version != steps.from_conda.outputs.version }}
-      run: exit 1
-  test_downstream:
-    needs: check_if_run
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        repo: ['downstream_1', 'downstream_2']
-      fail-fast: false
-    timeout-minutes: 120
-    steps:
-    - name: Trigger downstream test workflow and wait
-      uses: convictional/trigger-workflow-and-wait@v1.5.0
-      with:
-        owner: maximlt
-        repo: ${{ matrix.repo }}
-        github_token: ${{ secrets.MY_PAT }}
-        workflow_file_name: test.yaml
-        ref: main
-        wait_interval: 10
-        inputs: '{"caller": "from upstream"}'
-        propagate_failure: true
-        trigger_workflow: true
-        wait_workflow: true
+  downstream_tests:
+    uses: maximlt/run_downstream_tests/.github/workflows/run_downstream_tests.yaml
+    with:
+      downstream_repos_as_json: "{\"downstream_repo\":[\"downstream_1\", \"downstream_2\"]}"
+    secrets:
+      MY_PAT: ${{ secrets.MY_PAT }}
