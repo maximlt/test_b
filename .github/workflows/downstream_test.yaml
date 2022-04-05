@@ -66,6 +66,7 @@ jobs:
         repo: ['downstream_1', 'downstream_2']
       fail-fast: false
     timeout-minutes: 120
+    steps:
     - name: Trigger downstream test workflow and wait
       uses: convictional/trigger-workflow-and-wait@v1.5.0
       with:
