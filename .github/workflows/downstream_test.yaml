@@ -11,15 +11,11 @@ env:
   # REPO: ${{ github.event.repository.name }}
 
 jobs:
-  testing_downstream:
+  check_if_run:
     runs-on: ubuntu-latest
     # Run only if the build workflow has completed with success.
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
-    strategy:
-      matrix:
-        repo: ['downstream_1', 'downstream_2']
-      fail-fast: false
-    timeout-minutes: 120
+    timeout-minutes: 10
     steps:
     - name: Print event data
       env:
@@ -62,8 +58,17 @@ jobs:
     - name: Stop if git tag and conda version are different
       if: ${{ steps.from_git.outputs.version != steps.from_conda.outputs.version }}
       run: exit 1
-    - uses: convictional/trigger-workflow-and-wait@v1.5.0
-      name: Trigger downstream test workflow and wait
+  test_downstream:
+    needs: check_if_run
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        repo: ['downstream_1', 'downstream_2']
+      fail-fast: false
+    timeout-minutes: 120
+    steps:
+    - name: Trigger downstream test workflow and wait
+      uses: convictional/trigger-workflow-and-wait@v1.5.0
       with:
         owner: maximlt
         repo: ${{ matrix.repo }}
@@ -75,5 +80,3 @@ jobs:
         propagate_failure: true
         trigger_workflow: true
         wait_workflow: true
-
-
