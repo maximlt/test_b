@@ -2,9 +2,9 @@ name: testing_downstream
 
 on:
   # Run this workflow after the build workflow has completed.
-  # workflow_run:
-  #   workflows: [build]
-  #   types: [completed]
+  workflow_run:
+    workflows: [build]
+    types: [completed]
   workflow_dispatch:
 
 jobs:
