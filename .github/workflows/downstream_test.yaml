@@ -5,6 +5,7 @@ on:
   workflow_run:
     workflows: [build]
     types: [completed]
+  workflow_dispatch:
 
 jobs:
   downstream_tests:
