@@ -8,7 +8,7 @@ on:
 
 jobs:
   downstream_tests:
-    uses: maximlt/run_downstream_tests/.github/workflows/run_downstream_tests.yaml
+    uses: maximlt/run_downstream_tests/.github/workflows/run_downstream_tests.yaml@main
     with:
       downstream_repos_as_json: "{\"downstream_repo\":[\"downstream_1\", \"downstream_2\"]}"
     secrets:
