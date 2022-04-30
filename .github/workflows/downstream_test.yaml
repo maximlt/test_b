@@ -14,6 +14,10 @@ on:
         default: true
 
 jobs:
+  debug:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "${{ toJSON( github.event) }}"
   downstream_tests:
     uses: maximlt/run_downstream_tests/.github/workflows/run_downstream_tests.yaml@main
     with:
